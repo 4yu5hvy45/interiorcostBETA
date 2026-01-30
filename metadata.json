@@ -1,0 +1,7 @@
+{
+  "name": "InteriorCost.in",
+  "description": "An honest AI advisor for Indian homeowners to realistically estimate room improvement costs without unnecessary renovations.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
