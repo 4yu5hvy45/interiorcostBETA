@@ -11,29 +11,29 @@ export async function analyzeRoom(
   
   const prompt = `
     As an honest, practical Indian interior advisor for "unaesthetic" spaces, analyze this room photo.
-    User's Goal Budget: ${budget}
+    User's Goal Budget Level: ${budget}
     Desired Mood: ${mood}
 
     STRICT GUIDELINES:
-    1. Think like a "budget hacker." Focus on rented homes and typical "unaesthetic" Indian apartments (exposed wires, tubelights, mismatched furniture).
-    2. Prioritize high-impact, low-cost fixes:
-       - Painting walls flat white/off-white to create space.
-       - Swapping tubelights for warm floor lamps or Edison bulbs (₹500-₹1500).
-       - Adding cheap indoor plants (Snake plants, Pothos).
-       - Simple decluttering and cable management.
-       - Neutral curtains to replace busy patterns.
-    3. Be honest. If the layout is the main problem, suggest moving furniture first.
-    4. Avoid luxury/architect-grade language. Use words like "homely," "breathable," and "clean."
-    5. Cost estimate must be in Rupees (₹) and presented as a range like "₹X - ₹Y".
-    6. No emojis.
+    1. Think like a "budget hacker." Focus on rented homes and typical "unaesthetic" Indian apartments.
+    2. Prioritize high-impact, low-cost fixes: lighting, paint, plants, decluttering.
+    3. Provide a structured breakup of costs with ranges (e.g., "18,000 - 22,000").
+    4. Include an "Ultra-budget version" for users who negotiate labor or reuse items.
+    5. Include a "Designer POV" honest take, specifically a formula like "X + Y = Z% transformation".
 
     Return the analysis in the following JSON format:
     {
-      "verdict": "A concise assessment of why the room feels unaesthetic and its potential.",
-      "estimated_cost": "A realistic budget range in ₹.",
-      "worth_fixing": ["List 3-5 specific low-cost hacks"],
-      "avoid_spending_on": ["List items to NOT waste money on"],
-      "reasoning": "Explain why these simple changes (like lighting or paint) will change the energy of the space."
+      "verdict": "Short summary",
+      "estimated_cost": "₹TOTAL_MIN - ₹TOTAL_MAX",
+      "ultra_budget_cost": "₹ULTRA_MIN - ₹ULTRA_MAX",
+      "transformation_logic": "White paint + warm lighting = 70% transformation (or similar)",
+      "breakup": [
+        {"item": "Wall + ceiling paint", "cost": "18,000 - 22,000"},
+        {"item": "Lighting", "cost": "2,000 - 2,500"}
+      ],
+      "worth_fixing": ["Point 1", "Point 2"],
+      "avoid_spending_on": ["Skip this", "Skip that"],
+      "reasoning": "Simple explanation of the change in energy."
     }
   `;
 
@@ -55,11 +55,24 @@ export async function analyzeRoom(
           properties: {
             verdict: { type: Type.STRING },
             estimated_cost: { type: Type.STRING },
+            ultra_budget_cost: { type: Type.STRING },
+            transformation_logic: { type: Type.STRING },
+            breakup: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  item: { type: Type.STRING },
+                  cost: { type: Type.STRING }
+                },
+                required: ["item", "cost"]
+              }
+            },
             worth_fixing: { type: Type.ARRAY, items: { type: Type.STRING } },
             avoid_spending_on: { type: Type.ARRAY, items: { type: Type.STRING } },
             reasoning: { type: Type.STRING }
           },
-          required: ["verdict", "estimated_cost", "worth_fixing", "avoid_spending_on", "reasoning"]
+          required: ["verdict", "estimated_cost", "ultra_budget_cost", "transformation_logic", "breakup", "worth_fixing", "avoid_spending_on", "reasoning"]
         }
       }
     });
@@ -85,11 +98,8 @@ export async function visualizeImprovements(
     Based on this "unaesthetic" Indian room, generate a realistic "after" concept.
     Improvements: ${verdict.worth_fixing.join(', ')}
     Mood: ${mood}
-
-    Visual Style: 
-    Implement specific low-cost hacks: Warm lighting (yellow/orange glow), white walls, healthy indoor plants, and tidy surfaces. 
-    Keep the furniture structure the same but make the space feel breathable and intentional. 
-    It must look like a real home improvement, not a render. No luxury marble or false ceilings.
+    Implement specific low-cost hacks: Warm lighting, white walls, plants. 
+    Keep furniture structure same but make space breathable.
   `;
 
   try {

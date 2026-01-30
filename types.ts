@@ -2,9 +2,17 @@
 export type BudgetLevel = 'Minimal' | 'Moderate' | 'Significant';
 export type Mood = 'Calm & Minimal' | 'Warm & Cozy' | 'Professional & Sharp' | 'Vibrant & Desi';
 
+export interface CostBreakup {
+  item: string;
+  cost: string;
+}
+
 export interface Verdict {
   verdict: string;
   estimated_cost: string;
+  ultra_budget_cost: string;
+  transformation_logic: string;
+  breakup: CostBreakup[];
   worth_fixing: string[];
   avoid_spending_on: string[];
   reasoning: string;
